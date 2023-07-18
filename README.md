@@ -1,23 +1,35 @@
 # Tornado Async Transformer
 
-![](https://github.com/zhammer/tornado-async-transformer/workflows/CI/badge.svg)
+Tested with python3.11, may support >=python3.5 but that is untested.
 
-A [libcst](https://github.com/Instagram/LibCST) transformer for updating tornado @gen.coroutine syntax to python3.5+ native async/await.
+A [libcst](https://github.com/Instagram/LibCST) transformer for updating tornado @gen.coroutine syntax to python3.5+ native async/await and converting list yields to equivalent `asyncio.gather(*coros)`.
 
-[Check out the demo.](https://tornado-async-transformer.zhammer.now.sh/)
+### Install
+```bash
+pip install git+https://github.com/jgibo/tornado-async-transformer@0.3.0
+```
 
 ### Usage
-You can either:
-- Add `tornado_async_transformer.TornadoAsyncTransformer` to your existing libcst codemod.
-- Or run `python -m tornado_async_transformer.tool my_project/` from the commandline.
+Inside the code directory you want to run the codemod on:
 
-#### Example
+Create `.libcst.codemod.yaml` with content:
+```yaml
+generated_code_marker: "@generated"
+formatter: ["cat", "-"]
+blacklist_patterns: []
+modules:
+- "tornado_async_transformer"
+repo_root: "."
+```
+
+Run the codemod, substitute SRC with a python file or directory:
+```bash
+python -m libcst.tool codemod tool.TornadoAsyncTransformer SRC
+```
+
+#### Example Codemod Output 
 ```diff
- """
- A simple coroutine.
- """
- from tornado import gen
-
+from tornado import gen
 
 -@gen.coroutine
 -def call_api():

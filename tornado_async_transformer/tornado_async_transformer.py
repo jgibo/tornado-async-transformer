@@ -2,6 +2,7 @@ from typing import List, Optional, Set, Tuple, Union
 
 import libcst as cst
 from libcst import matchers as m
+from libcst.codemod import CodemodContext, VisitorBasedCodemodCommand
 
 from tornado_async_transformer.helpers import (
     name_attr_possibilities,
@@ -43,7 +44,7 @@ class TransformError(Exception):
     """
 
 
-class TornadoAsyncTransformer(cst.CSTTransformer):
+class TornadoAsyncTransformer(VisitorBasedCodemodCommand):
     """
     A libcst transformer that replaces the legacy @gen.coroutine/yield
     async syntax with the python3.7 native async/await syntax.
@@ -52,7 +53,8 @@ class TornadoAsyncTransformer(cst.CSTTransformer):
     files.
     """
 
-    def __init__(self) -> None:
+    def __init__(self, context: CodemodContext):
+        super().__init__(context)
         self.coroutine_stack: List[bool] = []
         self.required_imports: Set[str] = set()
 
